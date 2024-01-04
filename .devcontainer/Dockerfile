@@ -24,7 +24,7 @@ RUN apt-get -y install --no-install-recommends tree
 RUN apt-get -y install --no-install-recommends git iproute2 procps iproute2 lsb-release ca-certificates
 RUN apt-get -y install build-essential postgresql-client inotify-tools 
 # Flutter deps
-RUN apt-get -y install openjdk-11-jdk-headless xz-utils curl wget zip unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback python3
+RUN apt-get -y install openjdk-17-jdk-headless xz-utils curl wget zip unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback python3 libxtst6
 
 # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
 RUN groupadd --gid $USER_GID $USERNAME 
@@ -48,7 +48,7 @@ USER ${USERNAME}
 ENV ANDROID_SDK_TOOLS_VERSION=8512546
 ENV ANDROID_PLATFORM_VERSION=33
 ENV ANDROID_BUILD_TOOLS_VERSION=33.0.0
-ENV ANDROID_HOME=$HOME/android-sdk-linux
+ENV ANDROID_HOME="/home/$USERNAME/android-sdk-linux"
 ENV ANDROID_SDK_ROOT="$ANDROID_HOME"
 ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/cmdline-tools/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator
 # Flutter SDK
@@ -56,43 +56,37 @@ ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/cmdline-tools/bin:${ANDROID_HOME}
 ENV FLUTTER_CHANNEL="stable"
 ENV FLUTTER_VERSION="3.16.5"
 # Make sure to use the needed channel and version for this.
-ENV FLUTTER_HOME=$HOME/flutter
+ENV FLUTTER_HOME="/home/$USERNAME/flutter"
 ENV PATH=${PATH}:${FLUTTER_HOME}/bin
-
-RUN echo ${HOME}
-RUN pwd
-RUN cd ~
 
 # Android SDK	
 RUN curl -C - --output ~/android-sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS_VERSION}_latest.zip
-RUN  mkdir -p ${ANDROID_HOME}/
-RUN  unzip -q ~/android-sdk-tools.zip -d ${ANDROID_HOME}/cmdline-tools/
-RUN  rm ~/android-sdk-tools.zip
-RUN  yes | sdkmanager --licenses
-RUN  touch $HOME/.android/repositories.cfg
-RUN  sdkmanager platform-tools
-RUN  sdkmanager emulator
-RUN  sdkmanager "platforms;android-${ANDROID_PLATFORM_VERSION}" "build-tools;$ANDROID_BUILD_TOOLS_VERSION"
-RUN  sdkmanager --install "cmdline-tools;latest"
+RUN mkdir -p ${ANDROID_HOME}/
+RUN unzip -q ~/android-sdk-tools.zip -d ${ANDROID_HOME}/cmdline-tools/
+RUN rm ~/android-sdk-tools.zip
+RUN yes | sdkmanager --licenses
+RUN touch /home/$USERNAME/.android/repositories.cfg
+RUN sdkmanager platform-tools
+RUN sdkmanager emulator
+RUN sdkmanager "platforms;android-${ANDROID_PLATFORM_VERSION}" "build-tools;$ANDROID_BUILD_TOOLS_VERSION"
+RUN sdkmanager --install "cmdline-tools;latest"
 # create emulator android	
-# RUN  sdkmanager "system-images;android-${ANDROID_PLATFORM_VERSION};google_apis;x86_64" \
-# 	 && avdmanager create avd -n Android${ANDROID_PLATFORM_VERSION} -k "system-images;android-${ANDROID_PLATFORM_VERSION};google_apis;x86_64"
+RUN sdkmanager "system-images;android-${ANDROID_PLATFORM_VERSION};google_apis;x86_64"
+RUN echo "no" | avdmanager create avd -n Android${ANDROID_PLATFORM_VERSION} -k "system-images;android-${ANDROID_PLATFORM_VERSION};google_apis;x86_64"
 
 
 # Flutter SDK
-RUN curl -C - --output flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.tar.xz
-RUN tar -xf flutter.tar.xz -C ~
-# RUN rm flutter.tar.xz
-# RUN flutter config --android-sdk "${ANDROID_SDK_ROOT}"
-# RUN yes | flutter doctor --android-licenses
-# RUN flutter config --no-analytics
-# RUN flutter update-package
+RUN curl -C - --output ~/flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.tar.xz
+RUN tar -xf ~/flutter.tar.xz -C ~
+RUN rm ~/flutter.tar.xz
+RUN flutter config --android-sdk "${ANDROID_SDK_ROOT}"
+RUN yes | flutter doctor --android-licenses
+RUN flutter config --no-analytics
 
-# Elixir package resolving to local first, install phoenix installer
-# RUN mix local.hex --force
-# RUN mix local.rebar --force
-# RUN mix archive.install hex phx_new ${PHOENIX_VERSION}
-
+# Install Hex (elixir) pkg manager, Rebar3 (erlang) pkg manager, and phoenix installer
+RUN mix local.hex --force
+RUN mix local.rebar --force
+RUN mix archive.install hex phx_new ${PHOENIX_VERSION}
 
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog

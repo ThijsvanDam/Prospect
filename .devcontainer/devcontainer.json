@@ -1,19 +1,46 @@
 {
-    "name": "Elixir",
+    "name": "Relation Management Tool - Eixir + Flutter",
     "build": {
         "dockerfile": "Dockerfile",
         "context": ".."
     },
-    "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash"
-    },
-    "appPort": [],
+    "appPort": [
+        1337,
+        5432
+    ],
     "postCreateCommand": "",
     "remoteUser": "vscode",
-    "extensions": [
-        "editorconfig.editorconfig",
-        "github.vscode-pull-request-github",
-        "jakebecker.elixir-ls",
-        "redhat.vscode-yaml"
-    ]
+    "customizations": {
+        "settings": {
+            "terminal.integrated.defaultProfile.linux": "bash",
+            "liveServer.settings.root": "relation_manager/build/web",
+            "sqltools.connections": [
+                {
+                    "name": "Postgres DB",
+                    "driver": "PostgreSQL",
+                    "previewLimit": 50,
+                    "server": "localhost",
+                    "port": 5432,
+                    "database": "relation_dev",
+                    "username": "postgres",
+                    "password": "postgres"
+                }
+            ]
+        },
+        "vscode": {
+            "extensions": [
+                "editorconfig.editorconfig",
+                "github.vscode-pull-request-github",
+                "jakebecker.elixir-ls",
+                "redhat.vscode-yaml",
+                "dart-code.dart-code",
+                "dart-code.flutter",
+                "dbaeumer.vscode-eslint",
+                "mtxr.sqltools",
+                "mtxr.sqltools-driver-pg",
+                "jakebecker.elixir-ls",
+                "ritwickdey.LiveServer"
+            ]
+        }
+    }
 }

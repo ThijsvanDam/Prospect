@@ -77,8 +77,7 @@
                 "dbaeumer.vscode-eslint",
                 "mtxr.sqltools",
                 "mtxr.sqltools-driver-pg",
-                "jakebecker.elixir-ls",
-                "ritwickdey.LiveServer" 
+                "jakebecker.elixir-ls"
             ]
         }
     }

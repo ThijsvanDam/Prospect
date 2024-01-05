@@ -9,3 +9,10 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+
+alias Backend.Accounts.User
+alias Backend.Repo
+
+%User{name: "Nick Eilander"} |> Repo.insert!
+%User{name: "Mart Tiemes"} |> Repo.insert!

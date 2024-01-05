@@ -76,8 +76,7 @@
                 "dart-code.flutter",
                 "dbaeumer.vscode-eslint",
                 "mtxr.sqltools",
-                "mtxr.sqltools-driver-pg",
-                "jakebecker.elixir-ls"
+                "mtxr.sqltools-driver-pg"
             ]
         }
     }
